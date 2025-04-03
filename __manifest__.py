@@ -4,11 +4,12 @@
     "summary": """
         This module extends the Fleet module allowing gps tracking.""",
     'depends': ['fleet'],
-    'application': True,
-    'installable': True,
-    'data': [],
+    'data': [
+        'views/views.xml'
+    ],
     'assets': {
         'web.assets_backend': [
+            'fleet_traccar/static/src/**/*',
         ],
     },
 }

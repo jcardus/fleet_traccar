@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="fleet_traccar_map" model="ir.actions.client">
+            <field name="name">Map</field>
+            <field name="tag">fleet_traccar.map</field>
+        </record>
+        <menuitem id="menu_fleet_traccar_map"
+                  name="Map"
+                  parent="fleet.menu_root"
+                  action="fleet_traccar_map"
+                  sequence="20"
+        />
+    </data>
+</odoo>
