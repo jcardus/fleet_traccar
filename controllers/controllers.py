@@ -29,4 +29,8 @@ class ApiProxy(http.Controller):
             headers=dict(request.httprequest.headers),
             data=body,
         )
-        return request.make_response(response.content, status=response.status_code)
+        headers = dict()
+        if 'Set-Cookie' in response.headers:
+            headers['Set-Cookie'] = response.headers['Set-Cookie']
+
+        return request.make_response(response.content, status=response.status_code, headers=headers)
