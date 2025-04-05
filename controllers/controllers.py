@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
 from odoo import http
 from odoo.http import request
-
-logger = logging.getLogger(__name__)
 
 import requests
 
@@ -18,7 +14,7 @@ class ApiProxy(http.Controller):
             'fleet_traccar.api_base_url') or 'http://gps.frotaweb.com/api'
         response = requests.request(
             method=request.httprequest.method,
-            url=f"{base_url.rstrip('/')}/{_path}",
+            url=f"{base_url.rstrip('/')}/{_path}?{request.httprequest.query_string.decode('utf-8')}",
             headers=dict(request.httprequest.headers),
             data=request.httprequest.data if request.httprequest.method in ['POST', 'PUT'] else None,
         )
