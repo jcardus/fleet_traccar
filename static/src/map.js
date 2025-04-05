@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import {Component, onWillStart} from "@odoo/owl"
+import {Component, onWillStart, useState} from "@odoo/owl"
 import {registry} from "@web/core/registry"
 import {rpc} from "@web/core/network/rpc";
 import {session} from "@web/session";
@@ -17,6 +17,7 @@ class OdooTraccar extends Component {
     static template = "fleet_traccar.map"
     setup() {
         this.formData = new URLSearchParams();
+        this.state = useState({iframeSrc: ""});
         onWillStart(async () => {
             let response = await fetch('/fleet_traccar/api/session')
             if (response.status === 404) {
@@ -30,16 +31,19 @@ class OdooTraccar extends Component {
                         },
                         body: JSON.stringify({email: this.email, password:this.password, name: this.email}),
                     });
-                    await this.login()
+                    response = await this.login()
+                    if (!response.ok) {
+                        throw new Error(await response.text())
+                    }
                 }
             }
+            this.state.iframeSrc = '/fleet_traccar/static/traccar/index.html?locale=ptBR'
         });
     }
 
     async setEmailPass(session) {
         const instance_id = await rpc('/fleet_traccar/instance_id')
-        const company_id = session.user_companies.current_company
-        this.email = `odoo${company_id}_${instance_id}@frotaweb.com`;
+        this.email = `odoo_${session.db}_${session.user_companies.current_company}_${instance_id}@frotaweb.com`;
         this.password = await generatePassword(this.email)
         this.formData.set("email", this.email);
         this.formData.set("password", this.password);
