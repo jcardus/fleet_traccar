@@ -4,9 +4,9 @@ from odoo import http
 from odoo.http import request
 
 import requests
+import uuid
 
-
-class ApiProxy(http.Controller):
+class FleeTraccarController(http.Controller):
 
     @http.route('/fleet_traccar/api/<path:_path>', type='http', auth='user', csrf=False)
     def proxy_request(self, _path):
@@ -32,3 +32,13 @@ class ApiProxy(http.Controller):
             headers['Set-Cookie'] = response.headers['Set-Cookie']
 
         return request.make_response(response.content, status=response.status_code, headers=headers)
+
+
+    @http.route('/fleet_traccar/instance_id', type='json')
+    def get_instance_id(self):
+        unique_id = 'fleet_traccar.unique_id'
+        instance_id = request.env['ir.config_parameter'].get_param(unique_id)
+        if not instance_id:
+            instance_id = str(uuid.uuid4())  # Generate a unique UUID
+            request.env['ir.config_parameter'].set_param(unique_id, instance_id)
+        return instance_id
