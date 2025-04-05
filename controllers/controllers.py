@@ -18,4 +18,4 @@ class ApiProxy(http.Controller):
             headers=dict(request.httprequest.headers),
             data=request.httprequest.data if request.httprequest.method in ['POST', 'PUT'] else None,
         )
-        return request.make_response(response.content)
+        return request.make_response(response.content, status=response.status_code)
