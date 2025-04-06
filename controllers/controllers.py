@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from http.cookies import SimpleCookie
 
 from odoo import http
 from odoo.http import request
@@ -30,6 +31,15 @@ class FleeTraccarController(http.Controller):
         headers = dict()
         if 'Set-Cookie' in response.headers:
             headers['Set-Cookie'] = response.headers['Set-Cookie']
+            cookie = SimpleCookie(response.headers['Set-Cookie'])
+            session = request.env['fleet_traccar.session'].sudo().search([('user_id', '=', request.env.user.id)], limit=1)
+            if session:
+                session.write({'cookie': cookie.get('JSESSIONID').value})
+            else:
+                request.env['fleet_traccar.session'].sudo().create({
+                    'user_id': request.env.user.id,
+                    'cookie': cookie,
+                })
 
         return request.make_response(response.content, status=response.status_code, headers=headers)
 
