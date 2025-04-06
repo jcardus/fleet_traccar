@@ -35,6 +35,7 @@ class OdooTraccar extends Component {
                     if (!response.ok) {
                         throw new Error(await response.text())
                     }
+                    await rpc('/fleet_traccar/add_devices')
                 }
             }
             this.state.iframeSrc = '/fleet_traccar/static/traccar/index.html?locale=ptBR'

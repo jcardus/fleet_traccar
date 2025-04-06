@@ -2,6 +2,7 @@
 from http.cookies import SimpleCookie
 
 from odoo import http
+from odoo.exceptions import UserError
 from odoo.http import request
 
 import requests
@@ -9,10 +10,13 @@ import uuid
 
 class FleeTraccarController(http.Controller):
 
+    def get_base_url(self):
+        return request.env['ir.config_parameter'].sudo().get_param(
+            'fleet_traccar.api_base_url') or 'http://gps.frotaweb.com/api'
+
     @http.route('/fleet_traccar/api/<path:_path>', type='http', auth='user', csrf=False)
     def proxy_request(self, _path):
-        base_url = request.env['ir.config_parameter'].sudo().get_param(
-            'fleet_traccar.api_base_url') or 'http://gps.frotaweb.com/api'
+        base_url = self.get_base_url()
 
         if request.httprequest.method in ['POST', 'PUT']:
             if 'application/x-www-form-urlencoded' in request.httprequest.headers.get('Content-Type', ''):
@@ -43,7 +47,6 @@ class FleeTraccarController(http.Controller):
 
         return request.make_response(response.content, status=response.status_code, headers=headers)
 
-
     @http.route('/fleet_traccar/instance_id', type='json')
     def get_instance_id(self):
         unique_id = 'fleet_traccar.unique_id'
@@ -52,3 +55,41 @@ class FleeTraccarController(http.Controller):
             instance_id = str(uuid.uuid4())  # Generate a unique UUID
             request.env['ir.config_parameter'].set_param(unique_id, instance_id)
         return instance_id
+
+    @http.route('/fleet_traccar/add_devices', auth='user', type='json')
+    def add_devices(self):
+        base_url = self.get_base_url()
+        cookie = request.httprequest.headers.get('Cookie')
+
+        response = requests.get(
+            f"{base_url.rstrip('/')}/devices", headers={'Cookie': cookie})
+
+        if response.ok and len(response.json()) == 0:
+            vehicles = request.env['fleet.vehicle'].sudo().search([])
+            created = []
+
+            for vehicle in vehicles:
+                unique_id = str(uuid.uuid4())
+                device_data = {
+                    "name": vehicle.name,
+                    "uniqueId": unique_id,
+                    "attributes": {
+                        "odoo_vehicle_id": vehicle.id
+                    }
+                }
+
+                response = requests.post(
+                    f"{base_url.rstrip('/')}/devices",
+                    json=device_data,
+                    headers={
+                        'Cookie': cookie
+                    }
+                )
+
+                if not response.ok:
+                    raise UserError(f"Failed to add device for {vehicle.name}: {response.text}")
+                device = response.json()
+                vehicle.sudo().write({'traccar_device_id': device['id']})
+                created.append(vehicle.id)
+            return {'added': created}
+        raise UserError(response.text)
