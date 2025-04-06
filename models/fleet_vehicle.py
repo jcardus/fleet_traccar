@@ -3,12 +3,11 @@ import requests
 from odoo import models, fields
 from odoo.exceptions import ValidationError
 
-sync_fields = {'name', 'tracking_device_sn'}
-
+sync_fields = {'license_plate', 'tracking_device_sn'}
 
 def odoo_to_traccar(device, vals):
-    if 'name' in vals:
-        device['name'] = vals['name']
+    if 'license_plate' in vals:
+        device['name'] = vals['license_plate']
     if 'tracking_device_sn' in vals:
         device['uniqueId'] = vals['tracking_device_sn']
 

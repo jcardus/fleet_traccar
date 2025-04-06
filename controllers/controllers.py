@@ -71,7 +71,7 @@ class FleeTraccarController(http.Controller):
             for vehicle in vehicles:
                 unique_id = str(uuid.uuid4())
                 device_data = {
-                    "name": vehicle.name,
+                    "name": vehicle.license_plate,
                     "uniqueId": unique_id,
                     "attributes": {
                         "odoo_vehicle_id": vehicle.id
