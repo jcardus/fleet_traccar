@@ -14,8 +14,9 @@
         <record id="fleet_traccar_trip_report" model="ir.actions.act_window">
             <field name="name">Trip Report</field>
             <field name="res_model">fleet_traccar.trip</field>
-            <field name="view_mode">list</field>
+            <field name="view_mode">list,search</field>
         </record>
+
         <menuitem id="menu_fleet_trip_report"
               name="Trip Report"
               parent="fleet.menu_fleet_reporting"
@@ -41,6 +42,25 @@
                     <field name="end_time"/>
                     <field name="distance"/>
                 </list>
+            </field>
+        </record>
+        <record id="fleet_traccar_trip_search" model="ir.ui.view">
+            <field name="name">fleet_traccar.trip.tree</field>
+            <field name="model">fleet_traccar.trip</field>
+            <field name="arch" type="xml">
+                <search string="Trips date range">
+                    <field name="vehicle_id" string="Vehicle" filter_domain="[('vehicle_id.name','ilike', self)]"/>
+                    <filter name="date_this_week" string="This Week" domain="[
+                        ('start_time', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc())),
+                        ('start_time', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc())),
+                    ]"/>
+                    <filter name="date_today" string="Today" domain="[('start_time', '&gt;', datetime.datetime.combine(context_today() - relativedelta(days=1), datetime.time(23, 59, 59)).to_utc())]"/>
+                    <filter name="date_last_week" string="Last Week" domain="[
+                        ('start_time', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-2,days=1,weekday=0), datetime.time(0,0,0)).to_utc())),
+                        ('start_time', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc())),
+                    ]"/>
+                    <separator/>
+                </search>
             </field>
         </record>
     </data>
