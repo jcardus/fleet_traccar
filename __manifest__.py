@@ -5,7 +5,8 @@
         This module extends the Fleet module allowing gps tracking.""",
     'depends': ['fleet'],
     'data': [
-        'views/views.xml'
+        'views/views.xml',
+        'security/ir.model.access.csv'
     ],
     'assets': {
         'web.assets_backend': [

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+fleet_traccar.access_fleet_traccar_session,access_fleet_traccar_session,fleet_traccar.model_fleet_traccar_session,base.group_user,1,0,0,0
+fleet_traccar.access_fleet_traccar_trip,access_fleet_traccar_trip,fleet_traccar.model_fleet_traccar_trip,base.group_user,1,0,0,0

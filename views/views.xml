@@ -11,6 +11,17 @@
                   sequence="20"
         />
 
+        <record id="fleet_traccar_trip_report" model="ir.actions.act_window">
+            <field name="name">Trip Report</field>
+            <field name="res_model">fleet_traccar.trip</field>
+            <field name="view_mode">list</field>
+        </record>
+        <menuitem id="menu_fleet_trip_report"
+              name="Trip Report"
+              parent="fleet.menu_fleet_reporting"
+              action="fleet_traccar_trip_report"
+        />
+
         <record id="fleet_traccar_vehicle_view_form" model="ir.ui.view">
             <field name="name">fleet_traccar.vehicle.form.inherit</field>
             <field name="model">fleet.vehicle</field>
@@ -21,6 +32,16 @@
                 </xpath>
             </field>
         </record>
-
+        <record id="fleet_traccar_trip_list" model="ir.ui.view">
+            <field name="name">fleet_traccar.trip.tree</field>
+            <field name="model">fleet_traccar.trip</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="distance"/>
+                </list>
+            </field>
+        </record>
     </data>
 </odoo>
