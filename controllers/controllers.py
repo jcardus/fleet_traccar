@@ -3,7 +3,7 @@ from http.cookies import SimpleCookie
 
 from odoo import http
 from odoo.exceptions import UserError
-from odoo.http import request
+from odoo.http import request, Response
 
 import requests
 import uuid
@@ -93,3 +93,28 @@ class FleeTraccarController(http.Controller):
                 created.append(vehicle.id)
             return {'added': created}
         raise UserError(response.text)
+
+    @http.route('/fleet_traccar/contacts_kml', auth='user', type='http')
+    def contacts_kml(self):
+        partners = request.env['res.partner'].search([
+            ('partner_latitude', '!=', False),
+            ('partner_longitude', '!=', False)
+        ])
+        placemarks = ""
+        for partner in partners:
+            placemarks += f"""
+                    <Placemark>
+                        <name>{partner.name}</name>
+                        <Point>
+                            <coordinates>{partner.partner_longitude},{partner.partner_latitude},0</coordinates>
+                        </Point>
+                    </Placemark>
+                    """
+        kml_data = f"""<?xml version="1.0" encoding="UTF-8"?>
+                <kml xmlns="http://www.opengis.net/kml/2.2">
+                  <Document>
+                    <name>Contacts</name>
+                    {placemarks}
+                  </Document>
+                </kml>"""
+        return Response(kml_data)
